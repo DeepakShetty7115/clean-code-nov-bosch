@@ -13,17 +13,13 @@ using namespace std;
 class FindLetter
 {
 public:
-	virtual void findStringsContainingLetter(const string arr[], int size, char target) {
-	    bool found = false;
-	    for (int i = 0; i < size; ++i) {
-	        if (arr[i].find(target) != string::npos) {
-	            cout << "The letter '" << target << "' is found in the string: " << arr[i] << endl;
-	            found = true;
-	        }
-	    }
-	    if (!found) {
-	        cout << "The letter '" << target << "' is not found in any string in the array." << endl;
-	    }
+	virtual bool findStringsContainingLetter(const string st, char letter)
+	{
+        if (st.find(letter) != string::npos) {
+            return true;
+        }
+
+        return false;
 	}
 };
 
@@ -34,9 +30,13 @@ int main() {
 	FindLetter find_s;
 
 	int arraySize = sizeof(arry) / sizeof(arry[0]);
-	find_s.findStringsContainingLetter(arry, arraySize, 'S');
-	find_s.findStringsContainingLetter(arry, arraySize, 'D');
-	find_s.findStringsContainingLetter(arry, arraySize, 's');
+	for (int i = 0; i < arraySize; ++i)
+	{
+		auto status = find_s.findStringsContainingLetter(arry[i], 'S');
+		if(status) {
+			cout << "The letter 'S' found in the string: " << arry[i] << endl;
+		}
+	}
 
 	return 0;
 }
