@@ -13,7 +13,7 @@ using namespace std;
 class FindLetter
 {
 public:
-	virtual void findAndPrintStringsContainingLetter(const string arr[], int size, char target) {
+	virtual void findStringsContainingLetter(const string arr[], int size, char target) {
 	    bool found = false;
 	    for (int i = 0; i < size; ++i) {
 	        if (arr[i].find(target) != string::npos) {
@@ -34,7 +34,9 @@ int main() {
 	FindLetter find_s;
 
 	int arraySize = sizeof(arry) / sizeof(arry[0]);
-	find_s.findAndPrintStringsContainingLetter(arry, arraySize, 'S');
+	find_s.findStringsContainingLetter(arry, arraySize, 'S');
+	find_s.findStringsContainingLetter(arry, arraySize, 'D');
+	find_s.findStringsContainingLetter(arry, arraySize, 's');
 
 	return 0;
 }
