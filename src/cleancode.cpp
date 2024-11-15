@@ -13,7 +13,7 @@
 
 using namespace std;
 
-bool containsLetter(const std::string& str, char letter)
+bool ContainsLetter(const std::string& str, char letter)
 {
     for (char ch : str) {
         if (ch == letter) {
@@ -23,7 +23,15 @@ bool containsLetter(const std::string& str, char letter)
     return false;
 }
 
-bool findEndLetterMatches(const std::string& str, char letter)
+bool ContainsString(const std::string& str, std::string strtofind)
+{
+	if (str == strtofind) {
+            return true;
+    }
+    return false;
+}
+
+bool ContainsEndLetter(const std::string& str, char letter)
 {
 	if (!str.empty() && str.back() == letter) {
 		return true;
@@ -50,7 +58,7 @@ int main()
 
     // Create a std::function that checks for the specific letter
     std::function<bool(const std::string&)> letterCondition = [letter](const std::string& str) {
-        return containsLetter(str, letter);
+        return ContainsLetter(str, letter);
     };
 
     // Find strings that contain the specified letter
@@ -61,10 +69,10 @@ int main()
         std::cout << str << std::endl;
     }
 
-    letter = 'y';
+    std::string st = "banana";
     // Create a std::function that checks for the specific letter at the end
-    std::function<bool(const std::string&)> EndletterCondition = [letter](const std::string& str) {
-        return findEndLetterMatches(str, letter);
+    std::function<bool(const std::string&)> EndletterCondition = [st](const std::string& str) {
+        return ContainsString(str, st);
     };
 
     // Find strings that contain the specified letter at the end
@@ -74,7 +82,6 @@ int main()
     for (const std::string& str : EndfoundStrings) {
         std::cout << str << std::endl;
     }
-
 
     return 0;
 }
