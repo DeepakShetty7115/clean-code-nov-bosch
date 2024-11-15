@@ -10,6 +10,8 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include <sstream>
+#include <cassert>
 
 using namespace std;
 
@@ -51,37 +53,37 @@ std::vector<std::string> findStrings(const std::vector<std::string>& strings,
     return result;
 }
 
+std::string FormattedString(const std::vector<std::string>& vec) {
+    std::ostringstream oss;
+    for (const std::string& str : vec) {
+        oss << str << "\n";
+    }
+    return oss.str();
+}
+
 int main()
 {
     std::vector<std::string> strings = {"apple", "banana", "cherry", "date", "elderberry"};
-    char letter = 'a';
 
+    char letter = 'a';
     // Create a std::function that checks for the specific letter
     std::function<bool(const std::string&)> letterCondition = [letter](const std::string& str) {
         return ContainsLetter(str, letter);
     };
-
     // Find strings that contain the specified letter
     std::vector<std::string> foundStrings = findStrings(strings, letterCondition);
-
     std::cout << "Strings containing the letter '" << letter << "':" << std::endl;
-    for (const std::string& str : foundStrings) {
-        std::cout << str << std::endl;
-    }
+    std::cout << FormattedString(foundStrings);
 
     std::string st = "banana";
     // Create a std::function that checks for the specific letter at the end
     std::function<bool(const std::string&)> EndletterCondition = [st](const std::string& str) {
         return ContainsString(str, st);
     };
-
     // Find strings that contain the specified letter at the end
     std::vector<std::string> EndfoundStrings = findStrings(strings, EndletterCondition);
-
-    std::cout << "Strings containing the end letter '" << letter << "':" << std::endl;
-    for (const std::string& str : EndfoundStrings) {
-        std::cout << str << std::endl;
-    }
+    std::cout << "Matching string for : '" << st << "':" << std::endl;
+    std::cout << FormattedString(EndfoundStrings);
 
     return 0;
 }
