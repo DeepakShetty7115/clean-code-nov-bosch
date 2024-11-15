@@ -7,36 +7,76 @@
 //============================================================================
 
 #include <iostream>
+#include <vector>
 #include <string>
+#include <functional>
+
 using namespace std;
 
-class FindLetter
+bool containsLetter(const std::string& str, char letter)
 {
-public:
-	virtual bool findStringsContainingLetter(const string st, char letter)
-	{
-        if (st.find(letter) != string::npos) {
+    for (char ch : str) {
+        if (ch == letter) {
             return true;
         }
-
-        return false;
-	}
-};
-
-
-int main() {
-
-	std::string arry[] = {"Bosch", "BGSW", "Test", "Deepak", "Shetty"};
-	FindLetter find_s;
-
-	int arraySize = sizeof(arry) / sizeof(arry[0]);
-	for (int i = 0; i < arraySize; ++i)
-	{
-		auto status = find_s.findStringsContainingLetter(arry[i], 'S');
-		if(status) {
-			cout << "The letter 'S' found in the string: " << arry[i] << endl;
-		}
-	}
-
-	return 0;
+    }
+    return false;
 }
+
+bool findEndLetterMatches(const std::string& str, char letter)
+{
+	if (!str.empty() && str.back() == letter) {
+		return true;
+	}
+    return false;
+}
+
+std::vector<std::string> findStrings(const std::vector<std::string>& strings,
+		const std::function<bool(const std::string&)>& condition)
+{
+    std::vector<std::string> result;
+    for (const std::string& str : strings) {
+        if (condition(str)) {
+            result.push_back(str);
+        }
+    }
+    return result;
+}
+
+int main()
+{
+    std::vector<std::string> strings = {"apple", "banana", "cherry", "date", "elderberry"};
+    char letter = 'a';
+
+    // Create a std::function that checks for the specific letter
+    std::function<bool(const std::string&)> letterCondition = [letter](const std::string& str) {
+        return containsLetter(str, letter);
+    };
+
+    // Find strings that contain the specified letter
+    std::vector<std::string> foundStrings = findStrings(strings, letterCondition);
+
+    std::cout << "Strings containing the letter '" << letter << "':" << std::endl;
+    for (const std::string& str : foundStrings) {
+        std::cout << str << std::endl;
+    }
+
+    letter = 'y';
+    // Create a std::function that checks for the specific letter at the end
+    std::function<bool(const std::string&)> EndletterCondition = [letter](const std::string& str) {
+        return findEndLetterMatches(str, letter);
+    };
+
+    // Find strings that contain the specified letter at the end
+    std::vector<std::string> EndfoundStrings = findStrings(strings, EndletterCondition);
+
+    std::cout << "Strings containing the end letter '" << letter << "':" << std::endl;
+    for (const std::string& str : EndfoundStrings) {
+        std::cout << str << std::endl;
+    }
+
+
+    return 0;
+}
+
+
