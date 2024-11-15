@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : cleancode.cpp
-// Author      : 
+// Author      :
 // Version     :
 // Copyright   : Your copyright notice
 // Description : Hello World in C++, Ansi-style
@@ -15,22 +15,31 @@
 
 using namespace std;
 
-bool ContainsLetter(const std::string& str, char letter)
+function<bool(const string&)> ContainsLetter(char letter)
 {
-    for (char ch : str) {
-        if (ch == letter) {
-            return true;
-        }
-    }
-    return false;
+	function<bool(const string&)> contains = [letter](const string& item)->bool
+			{
+		for (char ch : item) {
+			if (ch == letter) {
+				return true;
+			}
+		}
+		return false;
+    };
+	return contains;
 }
 
-bool ContainsString(const std::string& str, std::string strtofind)
+
+function<bool(const string&)> ContainsString(std::string strtofind)
 {
-	if (str == strtofind) {
+	function<bool(const string&)> contains = [strtofind](const string& item)->bool
+			{
+	if (item == strtofind) {
             return true;
     }
     return false;
+	};
+	return contains;
 }
 
 bool ContainsEndLetter(const std::string& str, char letter)
@@ -66,23 +75,17 @@ int main()
     std::vector<std::string> strings = {"apple", "banana", "cherry", "date", "elderberry"};
 
     char letter = 'a';
-    // Create a std::function that checks for the specific letter
-    std::function<bool(const std::string&)> letterCondition = [letter](const std::string& str) {
-        return ContainsLetter(str, letter);
-    };
-    // Find strings that contain the specified letter
+    std::function<bool(const std::string&)> letterCondition = ContainsLetter(letter);
     std::vector<std::string> foundStrings = findStrings(strings, letterCondition);
     std::cout << "Strings containing the letter '" << letter << "':" << std::endl;
     std::cout << FormattedString(foundStrings);
 
-    std::string st = "banana";
-    // Create a std::function that checks for the specific letter at the end
-    std::function<bool(const std::string&)> EndletterCondition = [st](const std::string& str) {
-        return ContainsString(str, st);
-    };
+    std::string str = "banana";
+    std::function<bool(const std::string&)> EndletterCondition = ContainsString(str);
+
     // Find strings that contain the specified letter at the end
     std::vector<std::string> EndfoundStrings = findStrings(strings, EndletterCondition);
-    std::cout << "Matching string for : '" << st << "':" << std::endl;
+    std::cout << "Matching string for : '" << str << "':" << std::endl;
     std::cout << FormattedString(EndfoundStrings);
 
     return 0;
