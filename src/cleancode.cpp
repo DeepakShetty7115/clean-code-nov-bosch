@@ -15,6 +15,9 @@ public:
 };
 
 class TPMS {
+public :
+	virtual string GetTPMValue() = 0;
+
 protected:
 
 	~TPMS() {
@@ -27,6 +30,10 @@ protected:
 
 class NexDigitronTPMS : public TPMS {
 public:
+	string GetTPMValue() {
+		return "NexDigitronTPMS";
+	}
+
 	~NexDigitronTPMS() {
 		cout << "NexDigitronTPMS Destructed" << endl;
 	}
@@ -41,6 +48,9 @@ public:
 	}
 	BoschTPMS() {
 		cout << "BoschTPMS Constructed" << endl;
+	}
+	string GetTPMValue() {
+		return "BoschTPMS";
 	}
 };
 
@@ -86,6 +96,7 @@ int main() {
 	NexDigitronTPMS ndTpms;
 	buildCar(&bTpms);
 	buildCar(&ndTpms);
+
 	return 0;
 
 }
