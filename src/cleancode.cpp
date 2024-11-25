@@ -1,107 +1,107 @@
-#include <functional>
-#include <unordered_map>
 #include <iostream>
 #include <memory>
-
+#include <string>
 using namespace std;
 
-// Abstract base class for Jobs
-class Job {
+class IOutput {
 public:
-	virtual ~Job() = default;
-	virtual bool run() = 0;
+    virtual ~IOutput() = default;
+    virtual void print(const string& message) = 0;
 };
 
-// Concrete Job implementations
-class Spin: public Job {
+class ConsoleOutput : public IOutput {
 public:
-	bool run() override {
-		cout << "Spin";
-		return true;
-	}
+    void print(const string& message) override {
+        cout << message << endl;
+    }
 };
 
-class Slide: public Job {
+class IOTCloudCommunicator {
 public:
-	bool run() override {
-		cout << "Slide";
-		return true;
-	}
+    virtual ~IOTCloudCommunicator() = default;
+    virtual int pushMessage(const string& message) = 0;
 };
 
-class Hop: public Job {
+class RandomIOTCloudCommunicator : public IOTCloudCommunicator {
 public:
-	bool run() override {
-		cout << "Hop";
-		return true;
-	}
+    int pushMessage(const string& message) override {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> distr(200, 500);
+        return distr(gen);
+    }
 };
 
-// Job Factory
-class JobFactory {
+class BNFSpeedSensor {
 public:
-	using JobCreator = function<unique_ptr<Job>()>;
+    virtual ~BNFSpeedSensor() = default;
+    virtual int getCurrentSpeed() = 0;
+};
 
-	static JobFactory& getInstance() {
-		static JobFactory instance;
-		return instance;
-	}
+class RandomBNFSpeedSensor : public BNFSpeedSensor {
+public:
+    int getCurrentSpeed() override {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> distr(1, 100);
+        return distr(gen);
+    }
+};
 
-	void registerJob(unsigned int type, JobCreator creator) {
-		creators[type] = creator;
-	}
+class SpeedMonitor {
+private:
+    int _speedThreshold;
+    shared_ptr<BNFSpeedSensor> _speedSensor;
+    shared_ptr<IOTCloudCommunicator> _cloudCommunicator;
+    shared_ptr<IOutput> _output;
 
-	unique_ptr<Job> createJob(unsigned int type) const {
-		auto it = creators.find(type);
-		if (it != creators.end()) {
-			return it->second();
-		} else {
-			throw runtime_error("Unknown job type");
-		}
-	}
+public:
+    SpeedMonitor(int speedThreshold, shared_ptr<BNFSpeedSensor> speedSensor, shared_ptr<IOTCloudCommunicator> cloudCommunicator, shared_ptr<IOutput> output)
+        : _speedThreshold(speedThreshold), _speedSensor(speedSensor), _cloudCommunicator(cloudCommunicator), _output(output) {}
+
+    void monitor() {
+        if (!isValidSpeedThreshold()) {
+            reportInvalidSpeedThreshold();
+            return;
+        }
+
+        int currentSpeedInKmph = _speedSensor->getCurrentSpeed();
+        _output->print("Current Speed In Kmph: " + to_string(currentSpeedInKmph));
+
+        if (currentSpeedInKmph > _speedThreshold) {
+            double mph = currentSpeedInKmph * 0.621371;
+            string message = "Current Speed in Miles: " + to_string(mph);
+            int statusCode = _cloudCommunicator->pushMessage(message);
+            if (statusCode > 400) {
+                reportCommunicationError(message);
+            }
+        }
+    }
 
 private:
-	unordered_map<unsigned int, JobCreator> creators;
+    bool isValidSpeedThreshold() const {
+        return _speedThreshold >= 1 && _speedThreshold <= 100;
+    }
 
-	JobFactory() = default;
-	~JobFactory() = default;
+    void reportInvalidSpeedThreshold() const {
+        _output->print("_speedThreshold value must be in the range {1-100}: " + to_string(_speedThreshold));
+    }
 
-	// Disallow copying and assigning
-	JobFactory(const JobFactory&) = delete;
-	JobFactory& operator=(const JobFactory&) = delete;
+    void reportCommunicationError(const string& message) const {
+        _output->print("Error In Communication Unable to Contact Server: " + message);
+    }
 };
-
-// Icon class using the JobFactory to create Jobs
-class Icon {
-public:
-	Icon(unsigned value) :
-			subtype(value) {
-	}
-
-	bool move() {
-		return JobFactory::getInstance().createJob(subtype)->run();
-	}
-
-	bool flair() {
-		return JobFactory::getInstance().createJob(subtype)->run();
-	}
-
-private:
-	unsigned subtype;
-};
-
-void registerJobs(JobFactory& factory) {
-    factory.registerJob(1, []() { return make_unique<Spin>(); });
-    factory.registerJob(2, []() { return make_unique<Slide>(); });
-    factory.registerJob(3, []() { return make_unique<Hop>(); });
-}
 
 int main() {
-	JobFactory& factory = JobFactory::getInstance();
-	    registerJobs(factory);
+    auto speedSensor = make_shared<RandomBNFSpeedSensor>();
+    auto cloudCommunicator = make_shared<RandomIOTCloudCommunicator>();
+    auto output = make_shared<ConsoleOutput>();
 
-	Icon icon(2);
-	icon.move();
-	icon.flair();
-	return 0;
+    SpeedMonitor instance{10, speedSensor, cloudCommunicator, output};
+
+    instance.monitor();
+    instance.monitor();
+    instance.monitor();
+    instance.monitor();
+    instance.monitor();
 }
